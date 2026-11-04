@@ -205,6 +205,44 @@ cmd_mining() {
     echo "SELESAI (miner siap). Pool: ${pool_url}"
     echo "ADDRESS sudah ditulis skrip ini ke alamat kamu di atas."
     echo "Pastikan PRODUCTION_ADDRESS di skrip adalah alamat BNT kamu sendiri sebelum --run."
+    # Verifikasi checksum address (base58 + SHA3-256 domain-separated).
+    # Base58 itu case-sensitive; satu huruf salah bikin address invalid.
+    # Tanpa cek ini, typo di PRODUCTION_ADDRESS bisa lolos sampai mining.
+    python3 - <<'PYEOF' || die "ADDRESS CHECKSUM INVALID - berhenti, jangan mining"
+import hashlib, sys
+A = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+def b58d(s):
+    n = 0
+    for c in s: n = n*58 + A.index(c)
+    p = len(s) - len(s.lstrip('1'))
+    return b'\x00'*p + n.to_bytes((n.bit_length()+7)//8, 'big')
+addr = None
+for line in open('bakekok.sh'):
+    if line.startswith('ADDRESS='):
+        addr = line.split('=', 1)[1].strip()
+        break
+if not addr:
+    print('ADDRESS tidak ditemukan di bakekok.sh'); sys.exit(1)
+try:
+    raw = b58d(addr)
+except Exception:
+    print('ADDRESS bukan base58 yang valid: %r' % addr); sys.exit(1)
+if len(raw) != 68:
+    print('ADDRESS panjang decode salah: %d byte (harus 68)' % len(raw)); sys.exit(1)
+ck = hashlib.sha3_256(b'blocknet_stealth_address_checksum' + b'blocknet_mainnet' + raw[:64]).digest()[:4]
+if ck != raw[64:68]:
+    print('ADDRESS CHECKSUM INVALID')
+    print('  address : %s' % addr)
+    print('  cksum   : %s' % raw[64:68].hex())
+    print('  calc    : %s' % ck.hex())
+    print('  spendPub: %s' % raw[:32].hex())
+    print('  viewPub : %s' % raw[32:64].hex())
+    sys.exit(1)
+print('ADDRESS CHECKSUM VALID')
+print('  address : %s' % addr)
+print('  spendPub: %s' % raw[:32].hex())
+print('  viewPub : %s' % raw[32:64].hex())
+PYEOF
     if [ "$run_miner" = "1" ]; then
         echo "== 3. Jalankan miner =="
         nohup ./bakekok.sh > bakekok.log 2>&1 &
