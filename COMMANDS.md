@@ -14,7 +14,7 @@ Download `setup-complete.sh` dari repo ini. Baris `PRODUCTION_ADDRESS` sudah ter
 
 ```bash
 cd /root
-curl -fsSL -o setup-complete.sh https://raw.githubusercontent.com/n0krayy/bnt-relay/main/setup-complete.sh
+curl -fsSL -o setup-complete.sh https://raw.githubusercontent.com/asbryx/bnt-relay/main/setup-complete.sh
 chmod +x setup-complete.sh
 bash -n setup-complete.sh
 ./setup-complete.sh relay <IP-EGRESS-B>
@@ -28,7 +28,7 @@ Lulus kalau service `active`, ada listener di :443, dan iptables INPUT punya ACC
 
 ```bash
 cd /root
-curl -fsSL -o setup-complete.sh https://raw.githubusercontent.com/n0krayy/bnt-relay/main/setup-complete.sh
+curl -fsSL -o setup-complete.sh https://raw.githubusercontent.com/asbryx/bnt-relay/main/setup-complete.sh
 chmod +x setup-complete.sh
 bash -n setup-complete.sh
 # pastikan PRODUCTION_ADDRESS di file ini sudah alamat BNT kamu
