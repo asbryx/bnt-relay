@@ -100,4 +100,6 @@ log "Payout address: ${ADDRESS}"
 log 'Press Ctrl+C to stop mining.'
 
 # Run the miner in the foreground so logs are visible and Ctrl+C stops it.
-exec "$MINER" --pool-url "$POOL_URL" --address "$ADDRESS"
+# --no-auto-update: v0.3.0 ships a built-in self-updater. On a mining host we
+# want the pinned, hash-verified binary to stay put unless we choose to change it.
+exec "$MINER" --pool-url "$POOL_URL" --address "$ADDRESS" --no-auto-update
